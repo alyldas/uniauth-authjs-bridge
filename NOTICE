@@ -1,0 +1,3 @@
+UniAuth Auth.js Bridge
+
+This package maps Auth.js OAuth account data into UniAuth assertions.
