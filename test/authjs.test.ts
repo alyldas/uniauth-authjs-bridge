@@ -224,6 +224,25 @@ describe('Auth.js bridge', () => {
     })
   })
 
+  it('rejects token-shaped metadata fields', async () => {
+    await expect(
+      catchError(() =>
+        mapAuthJsOAuthToAssertion({
+          account: {
+            provider: 'google',
+            providerAccountId: 'user-1',
+          },
+          metadata: {
+            accessToken: 'secret-token',
+          },
+        }),
+      ),
+    ).resolves.toMatchObject({
+      code: UniAuthErrorCode.InvalidInput,
+      message: 'Bridge metadata must not include token or session fields.',
+    })
+  })
+
   it('accepts metadata records without an object prototype', () => {
     const metadata = Object.assign(Object.create(null) as Record<string, unknown>, {
       tenantId: 'tenant-1',

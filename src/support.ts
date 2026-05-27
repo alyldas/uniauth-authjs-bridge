@@ -1,5 +1,21 @@
 import { UniAuthError, UniAuthErrorCode } from '@alyldas/uniauth-core'
 
+const SENSITIVE_METADATA_KEYS = new Set([
+  'accessToken',
+  'access_token',
+  'authorization',
+  'cookie',
+  'idToken',
+  'id_token',
+  'jwt',
+  'refreshToken',
+  'refresh_token',
+  'session',
+  'sessionToken',
+  'session_token',
+  'token',
+])
+
 export function requireNonBlankString(value: unknown, message: string): string {
   if (typeof value !== 'string' || !value.trim()) {
     throw bridgeInvalidInput(message)
@@ -61,6 +77,10 @@ export function buildMetadata(
     const normalizedRecord = requirePlainRecord(record, 'Bridge metadata must be a plain object.')
 
     for (const [key, value] of Object.entries(normalizedRecord)) {
+      if (SENSITIVE_METADATA_KEYS.has(key)) {
+        throw bridgeInvalidInput('Bridge metadata must not include token or session fields.')
+      }
+
       if (value !== undefined) {
         metadata[key] = value
       }
